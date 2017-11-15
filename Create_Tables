@@ -1,0 +1,114 @@
+--This file creates tables and adds foreign keys
+CREATE TABLE Client (
+	IDClient int IDENTITY(1,1), --auto increment from 1, step=1
+	Name nvarchar(16) NOT NULL,
+	Surname nvarchar(32) NOT NULL,
+	LoveGenre nvarchar(32) DEFAULT 'All',
+	Address nvarchar(32) NOT NULL,
+	Phone varchar(12) NOT NULL UNIQUE,
+  CONSTRAINT PK_CL PRIMARY KEY CLUSTERED (IDClient)
+)
+GO
+
+CREATE TABLE Tariff (
+	IDTariff int IDENTITY(1,1),
+	Name_Of_Tariff nvarchar(20) NOT NULL,
+	Price_Of_Tariff money NOT NULL,
+  CONSTRAINT PK_T PRIMARY KEY CLUSTERED (IDTariff)
+)
+GO
+
+CREATE TABLE OrderTariff (
+	IDOrder_Tariff int IDENTITY(1,1),
+	IDClient int NOT NULL,
+	IDTariff int NOT NULL,
+	Date_Order_Tariff date NOT NULL DEFAULT getdate(),   --function getdate() returns today date
+  CONSTRAINT PK_OT PRIMARY KEY CLUSTERED (IDOrder_Tariff)
+)
+GO
+
+CREATE TABLE Channel (
+	IDChannel int IDENTITY(1,1),
+	Name_Channel nvarchar(32) NOT NULL,
+	IDTariff int NULL,
+	Price_Channel money NOT NULL,
+  CONSTRAINT PK_CH PRIMARY KEY CLUSTERED (IDchannel)
+)
+GO
+
+CREATE TABLE Movie (
+	IDMovie int IDENTITY(1,1),
+	Movie_Name nvarchar(32) NOT NULL,
+	Movie_Genre nvarchar(32) NOT NULL DEFAULT 'All',
+	Movie_Price money NOT NULL,
+	Date_Of_Premiere date NOT NULL DEFAULT getdate(),
+	Min_Age int NOT NULL DEFAULT '0',
+  CONSTRAINT PK_M PRIMARY KEY CLUSTERED (IDmovie)
+)
+GO
+
+CREATE TABLE OrderMovie (
+	IDOrder_Movie int IDENTITY(1,1),
+	IDClient int NOT NULL,
+	IDMovie int NOT NULL,
+	Date_Order_Movie date NOT NULL DEFAULT getdate(),
+  CONSTRAINT PK_OM PRIMARY KEY CLUSTERED (IDOrder_Movie)
+)
+GO
+
+CREATE TABLE OrderChannel (
+	IDOrder_Channel int IDENTITY(1,1),
+	IDclient int NOT NULL,
+	IDchannel int NOT NULL,
+	Date_Order_Channel date NOT NULL DEFAULT getdate(),
+  CONSTRAINT PK_OC PRIMARY KEY CLUSTERED(IDOrder_Channel)
+)
+GO
+
+CREATE TABLE Payment (
+	IDPayment int IDENTITY(1,1),
+	IDClient int NOT NULL,
+	Amount money NOT NULL,
+	Date_Of_Payment date NOT NULL DEFAULT getdate(),
+  CONSTRAINT PK_P PRIMARY KEY CLUSTERED (IDpayment)
+)
+GO
+
+
+ALTER TABLE [OrderTariff] ADD CONSTRAINT OT_FK_CL FOREIGN KEY ([IDclient]) REFERENCES [Client]([IDclient])
+ON UPDATE CASCADE 
+GO
+
+ALTER TABLE [OrderTariff] ADD CONSTRAINT OT_FK_T FOREIGN KEY ([IDtariff]) REFERENCES [Tariff]([IDtariff])
+ON UPDATE CASCADE
+GO
+
+ALTER TABLE [Channel] ADD CONSTRAINT CH_FK_T FOREIGN KEY ([IDtariff]) REFERENCES [Tariff]([IDtariff])
+ON UPDATE CASCADE ON DELETE SET NULL
+GO
+
+
+ALTER TABLE [OrderMovie] ADD CONSTRAINT OM_FK_CL FOREIGN KEY ([IDclient]) REFERENCES [Client]([IDclient])
+ON UPDATE CASCADE
+GO
+
+ALTER TABLE [OrderMovie] ADD CONSTRAINT OM_FK_M FOREIGN KEY ([IDmovie]) REFERENCES [Movie]([IDmovie])
+ON UPDATE CASCADE
+GO
+
+
+ALTER TABLE [OrderChannel] ADD CONSTRAINT OCH_FK_CL FOREIGN KEY ([IDclient]) REFERENCES [Client]([IDclient])
+ON UPDATE CASCADE
+GO
+
+ALTER TABLE [OrderChannel] ADD CONSTRAINT OCH_FK_CH FOREIGN KEY ([IDchannel]) REFERENCES [Channel]([IDchannel])
+ON UPDATE CASCADE
+GO
+
+
+ALTER TABLE [Payment] ADD CONSTRAINT P_FK_CL FOREIGN KEY ([IDclient]) REFERENCES [Client]([IDclient])
+ON UPDATE CASCADE
+GO
+
+ALTER TABLE [Movie] ADD CONSTRAINT DEF_DATE_PR DEFAULT getdate() FOR Date_Of_Premiere  
+GO
